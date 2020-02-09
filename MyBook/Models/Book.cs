@@ -1,6 +1,6 @@
 using System; 
 
-namespace MyBook {
+namespace MyBook.Models {
     public class Book {
         
         public int BookID { get; set; }
@@ -15,6 +15,15 @@ namespace MyBook {
 
         public bool Favorite { get; set; }
 
-    
+        public Book() {
+
+        }
+        public Book(string title, string genre, string description, bool status = false, bool favorite = false) {
+            Title = title;
+            Genre = genre;
+            Description = description;
+            Status = status;
+            Favorite = favorite;            
+        }
     }
 }
