@@ -6,12 +6,11 @@ namespace MyBook
 {
     class Program
     {
-        private static BookAccess contextBook { get; set;}
-        public Program() {
-            contextBook = new BookAccess();
-        }
+        private static BookAccess contextBook { get; set;}        
         static void Main(string[] args)
         {
+            contextBook = new BookAccess();
+
             int options;
 
             do {
@@ -27,8 +26,8 @@ namespace MyBook
                 
 
 
-            Console.Write("Press Enter to quit");
-            } while(Console.ReadKey().Key == ConsoleKey.Enter);
+                Console.Write("Press Enter to quit");
+            } while(Console.ReadKey().Key != ConsoleKey.Enter);
         }
 
         static void DisplayMenu() {
@@ -58,8 +57,12 @@ namespace MyBook
                     Console.WriteLine("Informe uma opção válida");
                     break;
             }
+            return;
         }
         static void AddBook() {
+
+            Console.Clear();
+            Console.WriteLine("Insira as informações do livro \n");
             Console.Write("Title:")    ;
             string title = Console.ReadLine();
             Console.Write("Genre:");
@@ -74,14 +77,42 @@ namespace MyBook
             Console.WriteLine($"Book {book.Title} added");
         }
         static void RemoveBook() {
+            Console.Write("Informe o título do livro: ");
+            var name = Console.ReadLine();
+            
+            var book = contextBook.GetBookByName(name);
 
+            if(book == null) {
+                Console.WriteLine($"{name} Não Existe");
+                return;
+            }
+            Console.Write($"Deseja mesmo remover {book.Title} yes/no: ");
+            var remove = Console.ReadLine();
+            
+            if(remove == "yes") {
+                contextBook.Remove(book);
+                Console.WriteLine("Livro removido com sucesso");                
+            }
+            
+            return;
         }
-        static IEnumerable<Book> GetBooks() {
-            return new List<Book>();
+        static void GetBooks() {
+            var books =  contextBook.GetBooks();
+
+            foreach(var book in books) {
+                Console.WriteLine($"Title: {book.Title}");
+            }
         }
 
-        static Book GetBook() {
-            return new Book();
+        static void GetBook() {
+            Console.Write("Informe o nome do livro: ");
+            var name = Console.ReadLine();
+
+            var book = contextBook.GetBookByName(name);
+            
+            Console.WriteLine($"Título: {book.Title}");
+            Console.WriteLine($"Gênero: {book.Genre}");
+            Console.WriteLine($"Descrição: {book.Description}");            
         }
 
         
