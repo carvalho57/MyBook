@@ -12,7 +12,7 @@ namespace MyBook.Data {
         static BookAccess() {
             using(var connection = new SqliteConnection("DataSource=book.db")) {
                 var command = connection.CreateCommand();
-                command.CommandText = "CREATE TABLE IF NOT EXISTS BookID INTEGER PRIMARY KEY AUTOINCREMENT,Title VARCHAR(50),Genre VARCHAR(30),Status INTEGER, Favorite INTEGER,Description VARCHAR(200));";
+                command.CommandText = "CREATE TABLE IF NOT EXISTS  Book (BookID INTEGER PRIMARY KEY AUTOINCREMENT,Title VARCHAR(50),Genre VARCHAR(30),Status INTEGER, Favorite INTEGER,Description VARCHAR(200));";
 
                 connection.Open();
                 command.ExecuteNonQuery();
