@@ -11,19 +11,23 @@ namespace MyBook.Models {
 
         public string Description { get; set; }
 
-        public bool Status { get; set; }
+        public bool Readed { get; set; }
 
         public bool Favorite { get; set; }
 
         public Book() {
 
         }
-        public Book(string title, string genre, string description, bool status = false, bool favorite = false) {
+        public Book(string title, string genre, string description, bool readed = false, bool favorite = false) {
             Title = title;
             Genre = genre;
             Description = description;
-            Status = status;
+            Readed = readed;
             Favorite = favorite;            
+        }
+
+        public override string ToString() {
+            return $"{BookID}{Title}\t{Genre}\t{Description}";
         }
     }
 }

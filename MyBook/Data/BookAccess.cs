@@ -5,120 +5,94 @@ using MyBook.Models;
 
 namespace MyBook.Data {
 
-    public class BookAccess {
-        
-        private readonly string ConnectionString = "DataSource=book.db";
-
-        static BookAccess() {
-            using(var connection = new SqliteConnection("DataSource=book.db")) {
-                var command = connection.CreateCommand();
-                command.CommandText = "CREATE TABLE IF NOT EXISTS  Book (BookID INTEGER PRIMARY KEY AUTOINCREMENT,Title VARCHAR(50),Genre VARCHAR(30),Status INTEGER, Favorite INTEGER,Description VARCHAR(200));";
-
-                connection.Open();
-                command.ExecuteNonQuery();
-
+    public class BookAccess {        
+        public BookAccess() {
+            using(var databaseCommand = new DAL()) {
+                var query = "CREATE TABLE IF NOT EXISTS  Book (BookID INTEGER PRIMARY KEY AUTOINCREMENT,Title VARCHAR(50),Genre VARCHAR(30),Readed INTEGER, Favorite INTEGER,Description VARCHAR(200));";
+                
+                databaseCommand.ExecuteNonQuery(query);
             }
         }
-        public void Add(Book book) {
-            using(var connection = new SqliteConnection(ConnectionString)) {
-                var command = connection.CreateCommand();
+        public void Add(Book book) {        
+            using (var databaseCommand = new DAL()) {                
+                var query = @"INSERT INTO Book( Title, Genre, Readed, Favorite, Description) VALUES (@Title, @Genre, @Readed, @Favorite, @Description )";
 
-                var query = $"INSERT INTO Book( Title, Genre, Status, Favorite, Description) VALUES (\"{book.Title}\", \"{book.Genre}\", {book.Status},{book.Favorite}, \"{book.Description}\" )";
-
-                command.CommandText = query;
-
-                connection.Open();
-
-                command.ExecuteNonQuery();
+                databaseCommand.AddParameter("@Title",book.Title);
+                databaseCommand.AddParameter("@Genre",book.Genre);
+                databaseCommand.AddParameter("@Readed",book.Readed);
+                databaseCommand.AddParameter("@Favorite",book.Favorite);
+                databaseCommand.AddParameter("@Description",book.Description);
+                                
+                databaseCommand.ExecuteNonQuery(query);
             }
         }
 
         public void Update(Book book) {
-            using(var connection = new SqliteConnection(ConnectionString)) {
-                var command = connection.CreateCommand();
+            using(var databaseCommand = new DAL()) {
+                
+                var query = @"UPDATE Book SET Title = @Title, Genre = @Genre, Readed = @Readed , Favorite = @Favorite, Description = @Description WHERE BookID = @BookID ;";
 
-                var query = $"UPDATE Book SET Title = \"{book.Title}\", Genre = \"{book.Genre}\", Status = {book.Status}, Favorite = {book.Favorite}, Description = \"{book.Description}\" WHERE BookID = {book.BookID};";
+                databaseCommand.AddParameter("@Title",book.Title);
+                databaseCommand.AddParameter("@Genre",book.Genre);
+                databaseCommand.AddParameter("@Readed",book.Readed);
+                databaseCommand.AddParameter("@Favorite",book.Favorite);
+                databaseCommand.AddParameter("@Description",book.Description);
+                databaseCommand.AddParameter("@BookID",book.Description);
 
-                command.CommandText = query;
-
-                connection.Open();
-
-                command.ExecuteNonQuery();
+                databaseCommand.ExecuteNonQuery(query);
             }
 
         }
 
         public void Remove(Book book) {
-            using(var connection = new SqliteConnection(ConnectionString)) {
-                var command = connection.CreateCommand();
+            using(var databaseCommand = new DAL()) {
+            
+                var query = @"DELETE FROM Book WHERE BookID = @BookID";
+                databaseCommand.AddParameter("@BookID",book.BookID);
 
-                var query = $"DELETE FROM Book WHERE BookID = {book.BookID}";
-
-                command.CommandText = query;
-
-                connection.Open();
-
-                command.ExecuteNonQuery();
+                databaseCommand.ExecuteNonQuery(query);
             }
         }
 
         public Book GetBookByName(string name) {
-            using(var connection = new SqliteConnection(ConnectionString)) {
+            using(var databaseCommand = new DAL()) {
             
-                var command = connection.CreateCommand();
-                var query = $"SELECT BookID, Title, Genre, Status, Favorite, Description FROM Book WHERE Title = \"{name}\";";
-                
+                var query = @"SELECT BookID, Title, Genre, Readed, Favorite, Description FROM Book WHERE Title = @name";
 
-                command.CommandText = query;
+                databaseCommand.AddParameter("@name",name);
 
-                connection.Open();
-
-                var reader = command.ExecuteReader();
+                var reader = databaseCommand.ExecuteReader(query);
                 
                 while(reader.Read()) {   
-                        return new Book {
-                            BookID = Convert.ToInt32(reader["BookID"]),
-                            Title = Convert.ToString(reader["Title"]),
-                            Genre = Convert.ToString(reader["Genre"]),
-                            Status = Convert.ToBoolean(reader["Status"]),
-                            Favorite = Convert.ToBoolean(reader["Favorite"]),
-                            Description = Convert.ToString(reader["Description"])
-
-                        };                        
+                        return ReadLineOfDataSet(reader);                        
                 }
                 
                 return null;
             }
         }
 
-        public List<Book> GetBooks() {
-            using(var connection = new SqliteConnection(ConnectionString)) {
-
-                var command = connection.CreateCommand();
-
-                var query = "SELECT BookID, Title, Genre, Status, Favorite, Description FROM Book";
-
-                command.CommandText = query;
-
-                connection.Open();
+        public ICollection<Book> GetBooks() {
+            using(var databaseCommand = new DAL()) {                
+                var query = @"SELECT BookID, Title, Genre, Readed, Favorite, Description FROM Book";
                 
-                var reader = command.ExecuteReader();
+                var reader = databaseCommand.ExecuteReader(query);
                 var books = new List<Book>();
                 while(reader.Read()) {
-                    books.Add( 
-                        new Book() {
-                            BookID = Convert.ToInt32(reader["BookID"]),
-                            Title = Convert.ToString(reader["Title"]),
-                            Genre = Convert.ToString(reader["Genre"]),
-                            Status = Convert.ToBoolean(reader["Status"]),
-                            Favorite = Convert.ToBoolean(reader["Favorite"]),
-                            Description = Convert.ToString(reader["Description"])
-                        }
-                    );
+                    books.Add(ReadLineOfDataSet(reader));
                 }
                 
                 return books;
             }
+        }
+        private Book ReadLineOfDataSet(SqliteDataReader reader) {
+            return  new Book() {
+                            BookID = Convert.ToInt32(reader["BookID"]),
+                            Title = Convert.ToString(reader["Title"]),
+                            Genre = Convert.ToString(reader["Genre"]),
+                            Readed = Convert.ToBoolean(reader["Readed"]),
+                            Favorite = Convert.ToBoolean(reader["Favorite"]),
+                            Description = Convert.ToString(reader["Description"])
+                        };
         }
     }
 }
