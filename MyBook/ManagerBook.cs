@@ -14,19 +14,22 @@ namespace MyBook
         }
 
 
-        public void Add(Book book)
+        public bool Add(Book book)
         {
+            
             if(isBookValid(book)) {
                 try {
                     _bookAccess.Add(book);
                 }catch(Exception ex) {
                     Console.WriteLine("Erro add",ex.Message);
-                }
-                
+                }                
+                return true;
             }
+            return false;
+            
         }
 
-        public void Remove(Book book)
+        public bool Remove(Book book)
         {
             var existBook = GetBookByName(book.Title);
             if(existBook != null) {
@@ -35,8 +38,10 @@ namespace MyBook
                 }catch(Exception ex) {
                     Console.WriteLine("Erro Remove",ex.Message);
                 }
-                
+                return true;    
             }
+            return false;
+            
         }
         public ICollection<Book> GetBooks()
         {
@@ -48,7 +53,18 @@ namespace MyBook
         }
 
         private bool isBookValid(Book book) {
-            return true;
+            ICollection<string> erros = new string[5];
+            if(book.Title.Length > 50) {
+                erros.Add("Título: Não pode ter mais de 50 caracteres");
+            }
+            if(book.Genre.Length > 30) {
+                erros.Add("Gênero: Não pode ter mais de 30 caracteres");
+            }
+            if(book.Description.Length > 200) {
+                erros.Add("Descrição: Não pode ter mais de 200 caracters");
+            }
+
+            return erros.Count <= 0;
         }
     }
 }
