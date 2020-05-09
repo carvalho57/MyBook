@@ -15,7 +15,7 @@ namespace MyBook.Data {
         private SqliteConnection Connection {get;set;}
         private ICollection<SqliteParameter> Parameters {get;set;}
         private readonly string ConnectionString;
-        public DAL(string connection = "DataSource=book.db") {
+        public DAL(string connection) {
            ConnectionString = connection;
            Connection = new  SqliteConnection(ConnectionString);                            
            Parameters = new List<SqliteParameter>();
@@ -37,9 +37,9 @@ namespace MyBook.Data {
             }
         }
 
-        private SqliteCommand PrepareCommand(string query) {   
-            OpenConnection();       
-            var command = new SqliteCommand(query,Connection);
+        private SqliteCommand PrepareCommand(string query) {     
+            OpenConnection();                
+            var command = new SqliteCommand(query,this.Connection);
             AddParameterToCommand(command);            
             return command;
         }
@@ -48,6 +48,15 @@ namespace MyBook.Data {
             try {            
                 var command = PrepareCommand(query);                
                 command.ExecuteNonQuery();                                
+            }catch(SqliteException ex) {
+                throw new SqliteException("Problema na conexão com o banco de dados",ex.ErrorCode);
+            }
+        }
+
+        public object ExecuteScalar(string query) {
+            try {            
+                var command = PrepareCommand(query);                
+                return command.ExecuteScalar();                                
             }catch(SqliteException ex) {
                 throw new SqliteException("Problema na conexão com o banco de dados",ex.ErrorCode);
             }
@@ -62,7 +71,7 @@ namespace MyBook.Data {
             }
         }   
 
-        public void CloseConnection() {
+        private void CloseConnection() {
             if(Connection != null || Connection.State != ConnectionState.Closed) {
                 Connection.Close();    
             }
@@ -70,7 +79,7 @@ namespace MyBook.Data {
 
         public void Dispose()
         {            
-            Connection.Close();
+            CloseConnection();
         }
     }
 }

@@ -3,7 +3,7 @@ using System;
 namespace MyBook.Models {
     public class Book {
         
-        public int BookID { get; set; }
+        public int? BookID { get; set; }
 
         public string Title { get; set; }
 
@@ -25,6 +25,16 @@ namespace MyBook.Models {
             Readed = readed;
             Favorite = favorite;            
         }
+
+         public Book(int id, string title, string genre, string description, bool readed = false, bool favorite = false) {
+            BookID = (int)id; 
+            Title = title;
+            Genre = genre;
+            Description = description;
+            Readed = readed;
+            Favorite = favorite;            
+        }
+
 
         public override string ToString() {
             return $"{BookID}{Title}\t{Genre}\t{Description}";
