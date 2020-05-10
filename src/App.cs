@@ -23,6 +23,12 @@ namespace MyBook
                         new MenuOption
                             ( "Remover livro", _controllerBook.RemoveBook ),
                         new MenuOption
+                            ( "Buscar livros de uma determinado gênero", _controllerBook.GetAllByGenre ),
+                        new MenuOption
+                            ( "Buscar todos os livros [lidos/ não lidos]", _controllerBook.GetAllByReaded ),
+                        new MenuOption
+                            ( "Buscar todos os livros [favoritos/ não favoritos]", _controllerBook.GetAllByFavorite),
+                        new MenuOption
                             ( "Sair", this.Sair,true)
             });
 

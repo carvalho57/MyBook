@@ -73,6 +73,31 @@ namespace MyBook.Business
                 return null;
             }
         }
+        
+        public ICollection<Book> GetAllByGenre(string genre) {
+            if(String.IsNullOrEmpty(genre)) 
+                return null;
+            try {
+                return  _bookAccess.GetAllByGenre(genre);                
+            }catch(Exception) {
+                return null;
+            }
+
+        }
+        public ICollection<Book> GetAllByReaded(bool readed) {
+            try {
+                return  _bookAccess.GetAllByReaded(readed);                
+            }catch(Exception) {
+                return null;
+            }
+        }
+        public ICollection<Book> GetAllByFavorite(bool favorite) {
+            try {
+                return  _bookAccess.GetAllByFavorite(favorite);                
+            }catch(Exception) {
+                return null;
+            }
+        }
         private bool BookExist(Book book) {            
             if(book.BookID == null)
                 return false;

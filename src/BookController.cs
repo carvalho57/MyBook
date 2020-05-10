@@ -64,8 +64,8 @@ namespace MyBook {
         public void GetAllBooks()
         {   
             var books = _managerBook.GetAll();            
-            foreach(Book book in books)
-                PrintBookScreen(book);
+            if(books != null)
+                PrintAllBook(books);
         }
 
         public void GetBook()
@@ -80,6 +80,36 @@ namespace MyBook {
             Write("Livro não encontrado!");            
         }
 
+        public void GetAllByGenre() {
+            string genre = ReadInputUser("Informe o gênero do livro:");
+            var books = _managerBook.GetAllByGenre(genre);
+
+            if(!PrintAllBook(books)) 
+                Write("Nenhum livro com base no gênero foi encontrado!");
+        }
+        public void GetAllByReaded() {
+            bool readed = false;
+            if(ReadInputUser("Você deseja os livros que ja foram lidos (yes/no):") == "yes")
+                readed = true;
+            
+            var books = _managerBook.GetAllByReaded(readed);
+
+            if(!PrintAllBook(books)) 
+                Write("Nenhum livro encontrado!");    
+        }
+        public void GetAllByFavorite() {
+            var message = "Você deseja todos os livro favoritos(yes/no):";
+            bool favorite = ReadInputUser(message) == "yes"
+                                                ? true
+                                                : false;
+                
+            
+            var books = _managerBook.GetAllByReaded(favorite);
+
+            if(!PrintAllBook(books)) 
+                Write("Nenhum livro encontrado!");    
+        }
+
         private void PrintBookScreen(Book book) {
            if(book is null)
                 return;
@@ -90,6 +120,15 @@ namespace MyBook {
             Write("-------------------------------");
         }
 
+        private bool PrintAllBook(ICollection<Book> books) {
+            if(books == null)
+                return false;
+
+             foreach(Book book in books)
+                PrintBookScreen(book);
+            
+            return true;
+        }
         private string ReadInputUser(string message) {
             Console.Write($"{message}");
             return Console.ReadLine();

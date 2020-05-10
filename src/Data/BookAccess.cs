@@ -72,10 +72,12 @@ namespace MyBook.Data {
             }
         }
 
+    
+
          public Book GetBookByTitle(string title) {
             using(var databaseCommand = new DAL(this.ConnectionString)) {
             
-                var query = @"SELECT BookID, Title, Genre, Readed, Favorite, Description FROM Book WHERE Title LIKE @title";
+                var query = @"SELECT BookID, Title, Genre, Readed, Favorite, Description FROM Book WHERE Title LIKE '@title%' LIMIT 1";
 
                 databaseCommand.AddParameter("@title",title);
 
@@ -101,7 +103,8 @@ namespace MyBook.Data {
             }
         }
         public ICollection<Book> GetAll() {
-            using(var databaseCommand = new DAL(this.ConnectionString)) {        
+            using(var databaseCommand = new DAL(this.ConnectionString)) {   
+                /*Melhorias -> Retornar apenas um limite de objetos, fazendo paginação*/     
                 var query = @"SELECT BookID, Title, Genre, Readed, Favorite, Description FROM Book";
                 
                 var reader = databaseCommand.ExecuteReader(query);
@@ -113,16 +116,65 @@ namespace MyBook.Data {
                 return books;
             }
         }
-        private Book ReadLineOfDataSet(SqliteDataReader reader) {
-            return  new Book() {
-                            BookID = Convert.ToInt32(reader["BookID"]),
-                            Title = Convert.ToString(reader["Title"]),
-                            Genre = Convert.ToString(reader["Genre"]),
-                            Readed = Convert.ToBoolean(reader["Readed"]),
-                            Favorite = Convert.ToBoolean(reader["Favorite"]),
-                            Description = Convert.ToString(reader["Description"])
-                        };
+ 
+
+        public ICollection<Book> GetAllByGenre(string genre)
+        {
+             using(var databaseCommand = new DAL(this.ConnectionString)) {        
+                var query = @"SELECT BookID, Title, Genre, Readed, Favorite, Description FROM Book WHERE Genre = @genre";
+
+                databaseCommand.AddParameter("@genre",genre);
+                var reader = databaseCommand.ExecuteReader(query);
+                var books = new List<Book>();
+                while(reader.Read()) {
+                    books.Add(ReadLineOfDataSet(reader));
+                }
+
+                return books;
+            }
         }
 
+        public ICollection<Book> GetAllByReaded(bool readed)
+        {
+             using(var databaseCommand = new DAL(this.ConnectionString)) {                        
+                var query = @"SELECT BookID, Title, Genre, Readed, Favorite, Description FROM Book WHERE Readed = @readed";
+
+                databaseCommand.AddParameter("@readed", Convert.ToInt32(readed));
+                var reader = databaseCommand.ExecuteReader(query);
+                var books = new List<Book>();
+                while(reader.Read()) {
+                    books.Add(ReadLineOfDataSet(reader));
+                }
+                
+                return books;
+            }
+        }
+
+        public ICollection<Book> GetAllByFavorite(bool favorite)
+        {
+            using(var databaseCommand = new DAL(this.ConnectionString)) {        
+                var query = @"SELECT BookID, Title, Genre, Readed, Favorite, Description FROM Book WHERE Favorite = @favorite";
+
+                databaseCommand.AddParameter("@favorite", Convert.ToInt32(favorite));
+                var reader = databaseCommand.ExecuteReader(query);
+                var books = new List<Book>();
+                while(reader.Read()) {
+                    books.Add(ReadLineOfDataSet(reader));
+                }
+                
+                return books;
+            }
+        }
+
+        private Book ReadLineOfDataSet(SqliteDataReader reader) {
+            return new Book(
+                            Convert.ToInt32(reader["BookID"]),                
+                            Convert.ToString(reader["Title"]),
+                            Convert.ToString(reader["Genre"]),
+                            Convert.ToString(reader["Description"]),
+                            Convert.ToBoolean(reader["Readed"]),
+                            Convert.ToBoolean(reader["Favorite"])
+                        );
+        }
     }
 }
